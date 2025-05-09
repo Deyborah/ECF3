@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Microservice Spring Boot : Recherche
+  search-service:
+    build: ./search-service
+    container_name: search-service
+    ports:
+      - "10000:8085"
+    networks:
+      - backend
+
+  # Microservices /server 
+  authentication-service:
+    build: ./server/authentication-service
+    container_name: authentication-service
+    ports:
+      - "7000:8080"
+    networks:
+      - backend
+
+  common-service:
+    build: ./server/common-data-service
+    container_name: common-data-service
+    ports:
+      - "9000:8080"
+    networks:
+      - backend
+
+  payment-service:
+    build: ./server/payment-service
+    container_name: payment-service
+    ports:
+      - "9050:8080"
+    networks:
+      - backend
+
+  # Frontend 
+  frontend:
+    build: ./client
+    container_name: react-client
+    ports:
+      - "3000:80"
+    depends_on:
+      - search-service
+      - authentication-service
+      - common-data-service
+      - payment-service
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
